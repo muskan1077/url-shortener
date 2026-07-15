@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: url-shortener
+  datasource:
+    url: jdbc:mysql://localhost:3306/url_shortener?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: root
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
