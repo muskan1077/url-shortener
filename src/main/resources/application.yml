@@ -7,8 +7,13 @@ spring:
     password: password
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     open-in-view: false
     properties:
       hibernate:
         format_sql: true
+
+app:
+  short-base-url: http://localhost:8080
+  cache:
+    ttl: 10m

@@ -7,5 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UrlMappingRepository extends JpaRepository<UrlMapping, Long> {
 
+    Optional<UrlMapping> findByIdempotencyKey(String idempotencyKey);
+
     Optional<UrlMapping> findByShortCode(String shortCode);
 }
