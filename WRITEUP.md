@@ -8,7 +8,7 @@ The main decisions I focused on were the product and correctness boundaries: gen
 
 ## 2. Where I Overrode, Corrected, Or Threw Away The AI's Output
 
-The initial scaffold was intentionally basic and left a few design questions unresolved. I then reviewed the gaps and corrected the design in a second pass. The biggest correction was replacing random generated codes with `u_` plus Base62 of the database id. That gives a collision-free generated code path and makes the alias collision rules explicit.
+The initial scaffold was basic and left a few design questions unresolved. I then reviewed the gaps and corrected the design in a second pass. The biggest correction was replacing random generated codes with `u_` plus Base62 of the database id. That gives a collision-free generated code path and makes the alias collision rules explicit.
 
 I also tightened idempotency. Instead of storing duplicate generated rows for the same URL, the service normalizes the URL, hashes it with SHA-256, and stores that hash as a unique idempotency key. I added a reserved prefix check for custom aliases so user-provided aliases cannot collide with generated codes. I also split URL normalization, hashing, and encoding into utilities because those rules are easier to test and reason about outside the service.
 
@@ -17,8 +17,6 @@ I also tightened idempotency. Instead of storing duplicate generated rows for th
 The first trade-off was code generation. A random NanoID-style code is simple and distributed-friendly, but it still needs collision checks and retry logic. I chose database-id Base62 encoding because it is collision-free for generated codes and easy to explain. The downside is that it exposes approximate creation order.
 
 The second trade-off was caching. I added Caffeine because redirect reads are likely to be hot and repeated, and an in-memory TTL cache is simple. The downside is that each application instance has its own cache. If this service were deployed across multiple nodes, I would consider Redis for shared caching and better operational visibility.
-
-The third trade-off was schema management. I used `schema.sql` and `ddl-auto=validate` to keep the exercise focused and reviewable. For production, I would use Flyway or Liquibase so schema changes are versioned and repeatable.
 
 ## 4. What's Missing, Or What I Would Do With Another Day
 

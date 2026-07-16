@@ -24,6 +24,40 @@ The project uses a standard layered Spring Boot structure:
 - Utility classes isolate Base62 encoding, SHA-256 hashing, and URL normalization.
 - Global exception handling returns consistent JSON errors.
 
+## Supported APIs And Methods
+
+### REST APIs
+
+| Method | Endpoint | Purpose | Success Response | Error Responses |
+| --- | --- | --- | --- | --- |
+| `POST` | `/shorten` | Creates a generated short URL or a custom alias. | `201 Created` with `shortCode`, `shortUrl`, and `originalUrl`. | `400 Bad Request` for invalid URL or alias, `409 Conflict` for duplicate alias. |
+| `GET` | `/{code}` | Redirects a short code or alias to the original URL. | `301 Moved Permanently` with `Location` header. | `404 Not Found` when the code does not exist. |
+
+`POST /shorten` accepts this request body:
+
+```json
+{
+  "url": "https://example.com/articles?id=10",
+  "customAlias": "optional-alias"
+}
+```
+
+`customAlias` is optional. When it is omitted, the service creates or returns the existing generated short URL for the normalized original URL.
+
+### Core Application Methods
+
+| Component | Method | Purpose |
+| --- | --- | --- |
+| `UrlShortenerController` | `shorten(ShortenRequest request)` | Handles `POST /shorten` and returns the created short URL response. |
+| `UrlShortenerController` | `redirect(String code)` | Handles `GET /{code}` and returns a `301` redirect to the original URL. |
+| `UrlShortenerService` | `shorten(ShortenRequest request)` | Coordinates URL normalization, idempotency, alias handling, and response creation. |
+| `UrlShortenerService` | `getOriginalUrl(String code)` | Looks up the original URL for a short code and caches successful lookups. |
+| `UrlMappingRepository` | `findByShortCode(String shortCode)` | Retrieves a mapping by generated code or custom alias. |
+| `UrlMappingRepository` | `findByIdempotencyKey(String idempotencyKey)` | Retrieves the existing generated mapping for a normalized URL hash. |
+| `UrlNormalizer` | `normalize(String input)` | Validates and canonicalizes incoming HTTP/HTTPS URLs. |
+| `UrlHasher` | `sha256Hex(String value)` | Hashes normalized URLs for efficient idempotency checks. |
+| `Base62Encoder` | `encode(long value)` | Converts database ids into compact generated code suffixes. |
+
 ## Data Model
 
 The service stores URL mappings in one table:
@@ -52,7 +86,6 @@ Generated URLs use `idempotency_key`, which is the SHA-256 hash of the normalize
 - Idempotency is enforced by a unique hash of the normalized URL. This avoids duplicate generated records without indexing the full URL.
 - URL normalization lowercases scheme and host, removes fragments, removes default ports, and ensures an empty path becomes `/`.
 - Redirect lookups are cached with Caffeine using a configurable TTL. This is simple and fast for a single instance. Redis would be a better fit for multiple application instances.
-- `spring.jpa.hibernate.ddl-auto=validate` is used for local runs so the app verifies the schema instead of silently changing it. Production should use Flyway or Liquibase migrations.
 
 ## Requirements
 
@@ -68,10 +101,10 @@ Start MySQL:
 docker compose up -d
 ```
 
-Apply the schema:
+Apply the schema using the MySQL client inside the Docker container:
 
 ```bash
-mysql -h 127.0.0.1 -uroot -ppassword url_shortener < src/main/resources/schema.sql
+docker exec -i url-shortener-mysql mysql -uroot -ppassword url_shortener < src/main/resources/schema.sql
 ```
 
 Run the app:
