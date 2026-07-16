@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS url_mappings (
     id BIGINT NOT NULL AUTO_INCREMENT,
     original_url VARCHAR(2048) NOT NULL,
-    original_url_hash CHAR(64) NOT NULL,
-    idempotency_key CHAR(64) NULL,
+    original_url_hash VARCHAR(64) NOT NULL,
+    idempotency_key VARCHAR(64) NULL,
     short_code VARCHAR(64) NOT NULL,
     custom_alias BIT NOT NULL,
     created_at DATETIME(6) NOT NULL,
