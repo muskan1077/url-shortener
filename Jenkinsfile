@@ -20,5 +20,11 @@ pipeline {
                 sh '/opt/homebrew/bin/mvn test'
             }
         }
+
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t url-shortener:1.0 .'
+            }
+        }
     }
 }
