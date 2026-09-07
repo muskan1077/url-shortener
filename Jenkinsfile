@@ -36,6 +36,8 @@ pipeline {
             steps {
                 sh '''
                     export PATH="/usr/local/bin:/Applications/Docker.app/Contents/Resources/bin:$PATH"
+
+                    docker compose down
                     docker compose up -d
                 '''
             }
