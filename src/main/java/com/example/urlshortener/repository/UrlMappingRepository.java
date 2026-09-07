@@ -11,3 +11,6 @@ public interface UrlMappingRepository extends JpaRepository<UrlMapping, Long> {
 
     Optional<UrlMapping> findByShortCode(String shortCode);
 }
+//We use Optional because the data may or may not exist in the database. Instead of returning null, it returns an Optional,
+// which makes us handle the "not found" case safely and helps avoid NullPointerException.
+//
