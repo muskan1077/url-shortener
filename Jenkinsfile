@@ -17,7 +17,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh 'mvn test'
+                sh '/opt/homebrew/bin/mvn test'
             }
         }
     }
