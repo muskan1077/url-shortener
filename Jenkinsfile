@@ -11,7 +11,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                sh '/opt/homebrew/bin/mvn clean package -DskipTests'
             }
         }
 
