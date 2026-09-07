@@ -34,7 +34,10 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'docker compose up -d'
+                sh '''
+                    export PATH="/usr/local/bin:/Applications/Docker.app/Contents/Resources/bin:$PATH"
+                    docker compose up -d
+                '''
             }
         }
     }
