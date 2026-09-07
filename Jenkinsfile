@@ -23,7 +23,12 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh '/usr/local/bin/docker build -t url-shortener:1.0 .'
+                sh '''
+                    export PATH="/usr/local/bin:/Applications/Docker.app/Contents/Resources/bin:$PATH"
+                    which docker
+                    which docker-credential-desktop
+                    docker build -t url-shortener:1.0 .
+                '''
             }
         }
     }
