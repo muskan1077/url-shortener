@@ -10,5 +10,13 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
 
+  app:
+    image: url-shortener:1.0
+    container_name: url-shortener-app
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql
+
 volumes:
   mysql-data:
