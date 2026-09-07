@@ -23,7 +23,7 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh 'docker build -t url-shortener:1.0 .'
+                sh '/usr/local/bin/docker build -t url-shortener:1.0 .'
             }
         }
     }
